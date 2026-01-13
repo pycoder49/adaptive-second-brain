@@ -2,6 +2,9 @@
 
 A full-stack intelligent knowledge management platform that lets you chat with your documents using RAG (Retrieval-Augmented Generation). Upload PDFs, ask questions, and get AI-powered answers from your personal knowledge base.
 
+## Planning:
+Done on this google doc: https://docs.google.com/document/d/1fSG7LxXG498K0HGJsts1rKcrZRbEhe30KTweYEudFBA/edit?usp=sharing
+
 ## Overview
 
 This project goes beyond simple document search by tracking how you engage with your knowledge base and surfacing your most-referenced topics on a personalized dashboard. It's designed for students, researchers, and knowledge workers who want to make their documents searchable and conversational.
