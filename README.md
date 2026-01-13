@@ -196,7 +196,7 @@ Located in `tests/evaluation/`:
 }
 ```
 
-### Metrics Tracked
+### Metrics Tracked for MVP
 - **Retrieval Accuracy**: Precision@k, Recall@k
 - **Answer Quality**: LLM-based evaluation or manual review
 - **End-to-End Latency**: Time from query to response
@@ -226,30 +226,6 @@ python tests/evaluation/run_evaluation.py
 3. **Migrate to Qdrant/Weaviate** → if vector search becomes bottleneck
 4. **Add caching layer** → Redis for frequently asked questions
 
-## Roadmap
-
-### Week 1: Core RAG Pipeline
-- [x] Database setup with pgvector
-- [ ] Document processing (extract, chunk, embed)
-- [ ] Basic retrieval and LLM integration
-- [ ] Test with sample documents
-
-### Week 2: API Layer
-- [ ] FastAPI endpoints (upload, query, list docs)
-- [ ] JWT authentication
-- [ ] Async document processing
-- [ ] Query logging
-
-### Week 3: Frontend & Dashboard
-- [ ] Streamlit UI (upload, chat interface)
-- [ ] Dashboard with top documents
-- [ ] User feedback (thumbs up/down)
-
-### Week 4: Polish & Deploy
-- [ ] Evaluation framework with test cases
-- [ ] Performance tuning (chunk size, top-k)
-- [ ] Error handling and edge cases
-- [ ] Deploy to cloud (Render/Railway/DigitalOcean)
 
 ## Key Design Decisions
 
@@ -273,17 +249,3 @@ python tests/evaluation/run_evaluation.py
 - Easy experimentation (change chunk_size without touching code)
 - Version control configuration alongside code
 - Clear documentation of current settings
-
-## Contributing
-
-This is a personal project, but feedback and suggestions are welcome! Open an issue to discuss potential changes.
-
-## License
-
-MIT License - feel free to use this for learning or as a starting point for your own projects.
-
-## Acknowledgments
-
-- Inspired by the "Building a Second Brain" methodology
-- RAG architecture based on modern LLM best practices
-- Thanks to the FastAPI, Streamlit, and pgvector communities
