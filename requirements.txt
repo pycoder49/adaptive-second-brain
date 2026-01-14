@@ -3,5 +3,6 @@ psycopg2
 pgvector
 
 datetime
+passlib
 
 dotenv
