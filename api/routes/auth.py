@@ -11,4 +11,8 @@ router = APIRouter(tags=["authentication"])
 
 @router.post("/login")
 def login(user_credentials: schemas.UserLogin, db: Session = Depends(get_db)):
-    user = db.query(models.)
+    # call the core (business) layer to authenticate user
+    try:
+        pass
+    except Exception as e:
+        pass
