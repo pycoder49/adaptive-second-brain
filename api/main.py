@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from ..database.database import Base, engine
+from .routes import auth, chat, documents, users
 
 
 @asynccontextmanager
@@ -29,4 +30,13 @@ app.add_middleware(
 )
 
 # routing paths
+app.include_router(auth.router)
+app.include_router(chat.router)
+app.include_router(documents.router)
 app.include_router(users.router)
+
+
+# root path
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the Adaptive Second Brain API!"}

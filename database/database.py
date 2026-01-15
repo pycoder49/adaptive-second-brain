@@ -27,7 +27,7 @@ SessionLocal = sessionmaker(
 
 Base = declarative_base()
 
-def get_db_engine():
+def get_db():
     """
     Returns the SQLAlchemy engine connected to the PostgreSQL database.
     """
