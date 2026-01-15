@@ -18,6 +18,7 @@ class ProcessingStatus(str, enum.Enum):
     PROCESSING = "processing"
     FAILED = "failed"
 
+
 class User(Base):
     # id, email, hased_password
     __tablename__ = "users"
@@ -45,6 +46,7 @@ class Document(Base):
     owner = relationship("User", back_populates="documents")
     chunks = relationship("Chunk", back_populates="document", cascade="all, delete-orphan")
 
+
 class Chunk(Base):
     # id, document_id(FK), content, embedding
     __tablename__ = "chunks"
@@ -56,6 +58,7 @@ class Chunk(Base):
 
     # relationships
     document = relationship("Document", back_populates="chunks")
+
 
 class QueryLog(Base):
     # id, user_id(FK), query text, retrieved_chunks, timestamp, latency_ms

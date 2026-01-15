@@ -5,4 +5,8 @@ pgvector
 datetime
 passlib
 
+fastapi
+uvicorn
+contextlib
+
 dotenv
