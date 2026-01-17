@@ -2,12 +2,13 @@ sqlalchemy
 psycopg2
 pgvector
 
-datetime
-passlib
-
 fastapi
 uvicorn
 pydantic[email]
 bcrypt
 
-dotenv
+langchain
+langchain-community
+
+datetime
+

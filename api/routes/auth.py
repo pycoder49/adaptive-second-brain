@@ -15,6 +15,14 @@ router = APIRouter(
 
 @router.post("/login")
 def login(user_credentials: schemas.UserLogin, db: Session = Depends(get_db)) -> dict:
+    """
+    Authenticates a user and returns user information upon successful login
+    
+    :param user_credentials: UserLogin schema object containing email and password
+    :param db: Database session dependency
+
+    :return: Dictionary containing user information if authentication is successful
+    """
     # call the auth_service layer within code (business) layer to authenticate user
     email = user_credentials.email
     password = user_credentials.password

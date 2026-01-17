@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-# uvircorn api.main:app --reload
+# uvircorn api.main:app --reload        for local testing
 
 # defining CORS origins
 origins = ["*"]
