@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from ..database.database import Base, engine
+from database.database import Base, engine
+
 from .routes import auth, chat, documents, users
 
 
@@ -18,6 +19,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+# uvircorn api.main:app --reload
 
 # defining CORS origins
 origins = ["*"]
