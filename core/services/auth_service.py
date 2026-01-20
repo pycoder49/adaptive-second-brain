@@ -2,6 +2,7 @@
 # calls on the db_access layer to fetch information from the database
 from sqlalchemy.orm import Session
 import datetime
+import logging
 
 from ..entities import user as user_entity
 from ..utils.utils import hash_password, verify_password
@@ -16,6 +17,10 @@ from .errors.user_errors import (
     UserAlreadyExistsException,
 )
 
+
+logger = logging.getLogger(__name__)
+
+
 def authenticate_user(db: Session, email: str, password: str) -> dict:
     """
     Authenticates a user by verifying their email and password
@@ -29,9 +34,12 @@ def authenticate_user(db: Session, email: str, password: str) -> dict:
     :return: A dictionary containing user information if authentication is successful
     :rtype: dict
     """
+    logger.info("Inside auth_service.authenticate_user()")
+
     # this method needs to call the db_access layer to verify user credentials
 
     # expects a UserRetrieve object from db_access layer
+    logger.info("Calling get_user_by_email from user_access")
     user_entity_obj = get_user_by_email(db, email)
 
     if user_entity_obj is None: # user not found
@@ -67,7 +75,10 @@ def register_user(
 
     :return: Dictionary containing user information upon successful registration
     """
+    logger.info("Inside auth_service.register_user()")
+
     # check if user already exists
+    logger.info("Checking if user already exists")
     existing_user = get_user_by_email(db, email)
     if existing_user:
         raise UserAlreadyExistsException()
@@ -84,13 +95,14 @@ def register_user(
         created_at=datetime.datetime.now(datetime.timezone.utc)
     )
 
+    logger.info("Calling create_user from user_access")
     user = create_user(db, user_entity_obj)
 
     return {
         "user_id": user.id,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
         "email": user.email,
-        "first_name": first_name,
-        "last_name": last_name,
     }
 
     

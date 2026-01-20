@@ -20,3 +20,11 @@ class UserCreate:
     email: str
     hashed_password: str
     created_at: str
+
+
+@dataclass
+class UserCreateResponse:
+    id: int
+    first_name: str
+    last_name: str
+    email: str

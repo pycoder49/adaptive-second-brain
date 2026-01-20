@@ -13,5 +13,3 @@ class UserLogin(BaseModel):
 class UserRegister(UserLogin):
     first_name: str
     last_name: str
-    email: EmailStr
-    password: str
