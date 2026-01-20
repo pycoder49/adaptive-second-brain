@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, Response, status
 from sqlalchemy.orm import Session
 import logging
 
-from ..schemas import schemas
+from ..schemas import user_schemas
 from database.database import get_db
 
 from core.services import auth_service
@@ -21,7 +21,7 @@ router = APIRouter(
 
 
 @router.post("/login")
-def login(user_credentials: schemas.UserLogin, db: Session = Depends(get_db)) -> dict:
+def login(user_credentials: user_schemas.UserLogin, db: Session = Depends(get_db)) -> dict:
     """
     Authenticates a user and returns user information upon successful login
     
@@ -48,7 +48,7 @@ def login(user_credentials: schemas.UserLogin, db: Session = Depends(get_db)) ->
 
 
 @router.post("/register",)
-def register(user_details: schemas.UserRegister, db: Session = Depends(get_db)) -> dict:
+def register(user_details: user_schemas.UserRegister, db: Session = Depends(get_db)) -> dict:
     """
     Registers a new user in the system
 

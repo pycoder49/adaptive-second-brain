@@ -1,4 +1,4 @@
-# contains custom exceptions for the service layer
+# contains custom exceptions for the user service layer
 
 
 class InvalidCredentialsException(Exception):

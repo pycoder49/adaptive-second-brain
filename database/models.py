@@ -69,9 +69,9 @@ class Chunk(Base):
     document = relationship("Document", back_populates="chunks")
 
 
-class Conversation(Base):
+class Chat(Base):
     # id, user_id (FK), title, created_at
-    __tablename__ = "conversations"
+    __tablename__ = "chats"
 
     id = Column(Integer, primary_key=True, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
@@ -84,7 +84,7 @@ class Message(Base):
     __tablename__ = "messages"
 
     id = Column(Integer, primary_key=True, nullable=False)
-    conversation_id = Column(Integer, ForeignKey("conversations.id"), nullable=False)
+    chat_id = Column(Integer, ForeignKey("chats.id"), nullable=False)
     role = Column(Enum(Role), nullable=False)
     content = Column(String, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
