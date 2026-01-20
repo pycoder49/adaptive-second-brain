@@ -1,11 +1,20 @@
 # services for authentication
 # calls on the db_access layer to fetch information from the database
 from sqlalchemy.orm import Session
+import datetime
 
 from ..entities import user as user_entity
-from database.db_access.user_access import get_user_by_email
-from ..utils.utils import verify_password
-from .errors.errors import InvalidCredentialsException, UserNotFoundException
+from ..utils.utils import hash_password, verify_password
+
+from database.db_access.user_access import (
+    get_user_by_email,
+    create_user,
+)
+from .errors.user_errors import (
+    InvalidCredentialsException, 
+    UserNotFoundException,
+    UserAlreadyExistsException,
+)
 
 def authenticate_user(db: Session, email: str, password: str) -> dict:
     """
@@ -20,10 +29,9 @@ def authenticate_user(db: Session, email: str, password: str) -> dict:
     :return: A dictionary containing user information if authentication is successful
     :rtype: dict
     """
-
     # this method needs to call the db_access layer to verify user credentials
 
-    # expects a User object from db_access layer
+    # expects a UserRetrieve object from db_access layer
     user_entity_obj = get_user_by_email(db, email)
 
     if user_entity_obj is None: # user not found
@@ -40,6 +48,50 @@ def authenticate_user(db: Session, email: str, password: str) -> dict:
         "email": user_entity_obj.email,
     }
 
+
+def register_user(
+        db: Session,
+        first_name: str,
+        last_name: str,
+        email: str,
+        password: str,
+) -> dict:
+    """
+    Registers a new user in the system
     
+    :param db: Database session
+    :param first_name: First name
+    :param last_name: Last name
+    :param email: user email
+    :param password: user password
+
+    :return: Dictionary containing user information upon successful registration
+    """
+    # check if user already exists
+    existing_user = get_user_by_email(db, email)
+    if existing_user:
+        raise UserAlreadyExistsException()
+
+    # hashing the password
+    hashed_password = hash_password(password)
+
+    # create a UserCreate entity object
+    user_entity_obj = user_entity.UserCreate(
+        first_name=first_name,
+        last_name=last_name,
+        email=email,
+        hashed_password=hashed_password,
+        created_at=datetime.datetime.now(datetime.timezone.utc)
+    )
+
+    user = create_user(db, user_entity_obj)
+
+    return {
+        "user_id": user.id,
+        "email": user.email,
+        "first_name": first_name,
+        "last_name": last_name,
+    }
+
     
     

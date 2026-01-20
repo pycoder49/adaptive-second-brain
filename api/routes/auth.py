@@ -5,7 +5,12 @@ from ..schemas import schemas
 from database.database import get_db
 
 from core.services import auth_service
-from core.services.errors.errors import InvalidCredentialsException, UserNotFoundException
+
+from core.services.errors.user_errors import (
+    InvalidCredentialsException, 
+    UserNotFoundException,
+    UserAlreadyExistsException
+)
 
 
 router = APIRouter(
@@ -32,5 +37,36 @@ def login(user_credentials: schemas.UserLogin, db: Session = Depends(get_db)) ->
         # expects a dict or error
     except (InvalidCredentialsException, UserNotFoundException) as e:
         raise HTTPException(status_code=401, detail=e.message)
+    
+    return user_info
+
+
+@router.post("/register",)
+def register(user_details: schemas.UserCreate, db: Session = Depends(get_db)) -> dict:
+    """
+    Registers a new user in the system
+
+    :param user_details: UserCreate schema object containing email and password
+    :param db: Database session dependency
+
+    :return: Dictionary containing user information upon successful registration
+    """
+    # calling the auth_service layer to take care of this operation
+    first_name = user_details.first_name
+    last_name = user_details.last_name
+    email = user_details.email
+    password = user_details.password
+
+    try:
+        user_info = auth_service.register_user(
+            db = db,
+            first_name = first_name,
+            last_name = last_name,
+            email = email,
+            password = password,
+        )
+    except UserAlreadyExistsException as e:
+        raise HTTPException(status_code=409, detail=e.message)
+        # conflict error for existing user
     
     return user_info
