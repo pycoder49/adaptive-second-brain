@@ -19,6 +19,8 @@ def get_user_by_email(db: Session, email: str) -> user_entity.UserRetrieve | Non
 
     returns a User entity object
     """
+    logger.info("Inside user_access.get_user_by_email()")
+    
     user_row = db.query(models.User).filter(models.User.email == email).first()
 
     if user_row is None: # user not found

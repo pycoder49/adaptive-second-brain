@@ -40,6 +40,7 @@ def login(user_credentials: schemas.UserLogin, db: Session = Depends(get_db)) ->
         user_info = auth_service.authenticate_user(db, email, password)
         # expects a dict or error
     except (InvalidCredentialsException, UserNotFoundException) as e:
+        logger.error("Authentication failed in login endpoint")
         raise HTTPException(status_code=401, detail=e.message)
     
     logger.info("User authenticated successfully -- logged in")
@@ -73,6 +74,7 @@ def register(user_details: schemas.UserRegister, db: Session = Depends(get_db)) 
             password = password,
         )
     except UserAlreadyExistsException as e:
+        logger.error("UserAlreadyExistsException caught in register endpoint")
         raise HTTPException(status_code=409, detail=e.message)
         # conflict error for existing user
     
