@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+import logging
+import datetime
+import os
 
 from database.database import Base, engine
 
@@ -16,6 +19,24 @@ async def lifespan(app: FastAPI):
 
     # shutdown code
     print("Shutting down...")
+
+# adding logging
+# adding logging
+now = datetime.datetime.now()
+
+date_folder = now.strftime('%m_%d_%Y')        # 01_20_2026
+time_folder = now.strftime('%H_%M_%S')        # 14_30_45
+
+logs_dir = os.path.join(os.getcwd(), "Logs", date_folder, time_folder)
+os.makedirs(logs_dir, exist_ok=True)
+
+LOG_FILE_PATH = os.path.join(logs_dir, "app.log")
+
+logging.basicConfig(
+    filename=LOG_FILE_PATH,
+    format="[ %(asctime)s ] %(lineno)d %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+)
 
 
 app = FastAPI(lifespan=lifespan)
