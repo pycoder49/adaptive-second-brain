@@ -10,16 +10,6 @@ from database.database import Base, engine
 from .routes import auth, chat, documents, users
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # startup code
-    print("Starting up...")
-    Base.metadata.create_all(bind=engine)   # create tables if they don't exist
-    yield
-
-    # shutdown code
-    print("Shutting down...")
-
 # adding logging
 # adding logging
 now = datetime.datetime.now()
@@ -37,6 +27,17 @@ logging.basicConfig(
     format="[ %(asctime)s ] %(lineno)d %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO,
 )
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # startup code
+    print("Starting up...")
+    Base.metadata.create_all(bind=engine)   # create tables if they don't exist
+    yield
+
+    # shutdown code
+    print("Shutting down...")
 
 
 app = FastAPI(lifespan=lifespan)
