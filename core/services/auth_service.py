@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 import datetime
 import logging
 
-from ..entities import user as user_entity
+from ..entities import user_entity as user_entity
 from ..utils.utils import hash_password, verify_password
 
 from database.db_access.user_access import (

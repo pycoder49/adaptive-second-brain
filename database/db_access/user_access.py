@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 import logging
 
-from core.entities import user as user_entity
+from core.entities import user_entity as user_entity
 from database import models
 
 """

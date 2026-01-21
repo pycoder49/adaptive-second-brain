@@ -6,6 +6,7 @@ fastapi
 uvicorn
 pydantic[email]
 bcrypt
+pyjwt
 
 langchain
 langchain-community
