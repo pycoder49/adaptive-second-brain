@@ -13,7 +13,7 @@ This module contains methods to access the database for
 logger = logging.getLogger(__name__)
 
 
-def get_user_by_email(db: Session, email: str) -> user_entity.UserRetrieve | None:
+def get_user_by_email(email: str, db: Session) -> user_entity.UserRetrieve | None:
     """
     Gets a user row by their email address
 
