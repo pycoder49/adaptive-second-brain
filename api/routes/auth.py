@@ -37,7 +37,7 @@ def login(user_credentials: user_schemas.UserLogin, db: Session = Depends(get_db
 
     try:
         logger.info("Calling auth_service.authenticate_user")
-        user_info = auth_service.authenticate_user(db, email, password)
+        user_info = auth_service.authenticate_user(email, password, db)
         # expects a dict or error
     except (InvalidCredentialsException, UserNotFoundException) as e:
         logger.error("Authentication failed in login endpoint")
@@ -67,11 +67,11 @@ def register(user_details: user_schemas.UserRegister, db: Session = Depends(get_
     try:
         logger.info("Calling auth_service.register_user")
         user_info = auth_service.register_user(
-            db = db,
             first_name = first_name,
             last_name = last_name,
             email = email,
             password = password,
+            db=db,
         )
     except UserAlreadyExistsException as e:
         logger.error("UserAlreadyExistsException caught in register endpoint")

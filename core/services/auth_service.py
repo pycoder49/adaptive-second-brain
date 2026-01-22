@@ -21,7 +21,7 @@ from .errors.user_errors import (
 logger = logging.getLogger(__name__)
 
 
-def authenticate_user(db: Session, email: str, password: str) -> dict:
+def authenticate_user(email: str, password: str, db: Session) -> dict:
     """
     Authenticates a user by verifying their email and password
 
@@ -40,7 +40,7 @@ def authenticate_user(db: Session, email: str, password: str) -> dict:
 
     # expects a UserRetrieve object from db_access layer
     logger.info("Calling get_user_by_email from user_access")
-    user_entity_obj = get_user_by_email(db, email)
+    user_entity_obj = get_user_by_email(email, db)
 
     if user_entity_obj is None: # user not found
         logger.info("User not found with this email")
@@ -81,7 +81,7 @@ def register_user(
 
     # check if user already exists
     logger.info("Checking if user already exists")
-    existing_user = get_user_by_email(db, email)
+    existing_user = get_user_by_email(email, db)
     if existing_user:
         logger.info("User already exists with this email")
         raise UserAlreadyExistsException()
@@ -99,7 +99,7 @@ def register_user(
     )
 
     logger.info("Calling create_user from user_access")
-    user = create_user(db, user_entity_obj)
+    user = create_user(user_entity_obj, db)
 
     return {
         "user_id": user.id,
