@@ -1,10 +1,12 @@
 # services for authentication
 # calls on the db_access layer to fetch information from the database
 from sqlalchemy.orm import Session
+from jose import JWTError, jwt
 import datetime
 import logging
 
 from ..entities import user_entity as user_entity
+from config.settings import settings
 from ..utils.utils import hash_password, verify_password
 
 from database.db_access.user_access import (
@@ -60,11 +62,11 @@ def authenticate_user(email: str, password: str, db: Session) -> dict:
 
 
 def register_user(
-        db: Session,
         first_name: str,
         last_name: str,
         email: str,
         password: str,
+        db: Session,
 ) -> dict:
     """
     Registers a new user in the system
@@ -108,5 +110,83 @@ def register_user(
         "email": user.email,
     }
 
+
+def create_access_token(data: dict) -> str:
+    """
+    Creates a JWT access token for the given user data
+
+    :param data: Dictionary containing user data to encode in the token
+    :return: JWT access token as a string
+    """
+    logger.info("Inside auth_service.create_access_token()")
+
+    to_encode = data.copy()
+    expires = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
+        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+    )
+    to_encode.update({"exp": expires})
+
+    encoded_jwt = jwt.encode(
+        to_encode,
+        settings.SECRET_KEY,
+        settings.ALGORITHM,
+    )
+
+    return encoded_jwt
+
+
+def verify_access_token(token: str) -> dict:
+    """
+    Verifies a JWT access token and returns the decoded data
+    
+    :param token: JWT access token as a string
+    :return: Decoded token data as a dictionary
+    """
+    logger.info("Inside auth_service.verify_access_token()")
+
+    try:
+        payload = jwt.decode(
+            token,
+            settings.SECRET_Key,
+            algorithms=[settings.ALGORITHM],
+        )
+
+        user_id = payload.get("user_id")
+        email = payload.get("email")
+
+        if user_id is None or email is None:
+            logger.error("Invalid token payload")
+            raise InvalidCredentialsException()
+        
+        logger.info("JWT token verified successfully")
+        return {
+            "user_id": user_id,
+            "email": email,
+        }
+    except JWTError:
+        logger.error("JWT verification failed")
+        raise InvalidCredentialsException()
+    
+
+def get_current_user(token: str, db: Session) -> user_entity.UserRetrieve:
+    """
+    Gets the current authenticated user from the JWT token
+
+    :param token: JWT access token as a string
+    :param db: Database session
+    :return: UserRetrieve entity object of the current user
+    """
+    logger.info("Inside auth_service.get_current_user()")
+
+    # verifying the token
+    payload = verify_access_token(token)
+    user_email = payload["email"]
+
+    user = get_user_by_email(user_email, db)
+    if user is None:
+        logger.error("User not found for the given token")
+        raise UserNotFoundException()
+
+    return user
     
     

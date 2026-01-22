@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Response, status
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 import logging
 
@@ -16,9 +17,11 @@ from core.services.errors.user_errors import (
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
+    prefix="/auth",
     tags=["Authentication"],
 )
 
+oauth_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 @router.post("/login")
 def login(user_credentials: user_schemas.UserLogin, db: Session = Depends(get_db)) -> dict:
@@ -36,15 +39,24 @@ def login(user_credentials: user_schemas.UserLogin, db: Session = Depends(get_db
     password = user_credentials.password
 
     try:
-        logger.info("Calling auth_service.authenticate_user")
         user_info = auth_service.authenticate_user(email, password, db)
-        # expects a dict or error
+
+        # creating the jwt access token
+        logger.info("Creating access token for authenticated user")
+        access_token = auth_service.create_access_token(
+            data={"user_id": user_info["user_id"], "email": user_info["email"]}
+        )
+    
     except (InvalidCredentialsException, UserNotFoundException) as e:
         logger.error("Authentication failed in login endpoint")
-        raise HTTPException(status_code=401, detail=e.message)
-    
-    logger.info("User authenticated successfully -- logged in")
-    return user_info
+        raise HTTPException(status_code=401, detail=e.message, headers={"WWW-Authenticate": "Bearer"})
+        # unauthorized error for invalid credentials
+
+    logger.info("Access token created successfully")
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+    }
 
 
 @router.post("/register",)
@@ -58,20 +70,15 @@ def register(user_details: user_schemas.UserRegister, db: Session = Depends(get_
     :return: Dictionary containing user information upon successful registration
     """
     logger.info(f"Inside register endpoint")
-    # calling the auth_service layer to take care of this operation
-    first_name = user_details.first_name
-    last_name = user_details.last_name
-    email = user_details.email
-    password = user_details.password
 
     try:
         logger.info("Calling auth_service.register_user")
         user_info = auth_service.register_user(
-            first_name = first_name,
-            last_name = last_name,
-            email = email,
-            password = password,
-            db=db,
+            first_name = user_details.first_name,
+            last_name = user_details.last_name,
+            email = user_details.email,
+            password = user_details.password,
+            db = db,
         )
     except UserAlreadyExistsException as e:
         logger.error("UserAlreadyExistsException caught in register endpoint")
@@ -80,3 +87,44 @@ def register(user_details: user_schemas.UserRegister, db: Session = Depends(get_
     
     logger.info("User registered successfully")
     return user_info
+
+
+# Dependency for protected routes to get current user
+def get_current_user(
+        token: str = Depends(oauth_scheme),
+        db: Session = Depends(get_db),
+):
+    """
+    Dependency to get current authenticated user from JWT token
+    Use this in protected routes: current_user = Depends(get_current_user)
+    
+    :param token: JWT token from Authorization header
+    :param db: Database session
+    :return: User object
+    """
+
+    # verify token and get current user
+    try:
+        user = auth_service.get_current_user(token, db)
+        return user
+    except InvalidCredentialsException as e:
+        logger.error("InvalidCredentialsException caught in get_current_user")
+        raise HTTPException(status_code=401, detail=e.message, headers={"WWW-Authenticate": "Bearer"})
+        
+    
+# route to test protected endpoint
+@router.get("/me")
+def read_me(current_user = Depends(get_current_user)):
+    """
+    Protected endpoint to get current authenticated user info
+
+    :param current_user: Current authenticated user from dependency
+    :return: Current user information
+    """
+    logger.info("Inside protected /me endpoint")
+    return {
+        "user_id": current_user.id,
+        "email": current_user.email,
+        "first_name": current_user.first_name,
+        "last_name": current_user.last_name,
+    }
