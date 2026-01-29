@@ -75,7 +75,7 @@ class Chat(Base):
 
     id = Column(Integer, primary_key=True, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    title = Column(String, nullable=False, default="New Conversation")
+    title = Column(String, nullable=False, default="New Chat")
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
 
 

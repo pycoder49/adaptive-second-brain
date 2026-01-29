@@ -44,9 +44,11 @@ def login(user_credentials: user_schemas.UserLogin, db: Session = Depends(get_db
         # creating the jwt access token
         logger.info("Creating access token for authenticated user")
         access_token = auth_service.create_access_token(
-            data={"user_id": user_info["user_id"], "email": user_info["email"]}
+            data={
+                "user_id": user_info["user_id"], 
+                "email": user_info["email"],
+            }
         )
-    
     except (InvalidCredentialsException, UserNotFoundException) as e:
         logger.error("Authentication failed in login endpoint")
         raise HTTPException(status_code=401, detail=e.message, headers={"WWW-Authenticate": "Bearer"})
@@ -106,14 +108,14 @@ def get_current_user(
     # verify token and get current user
     try:
         user = auth_service.get_current_user(token, db)
-        return user
+        return user.id
     except InvalidCredentialsException as e:
         logger.error("InvalidCredentialsException caught in get_current_user")
         raise HTTPException(status_code=401, detail=e.message, headers={"WWW-Authenticate": "Bearer"})
         
     
 # route to test protected endpoint
-@router.get("/me")
+@router.get("/me", response_model=user_schemas.UserResponse)
 def read_me(current_user = Depends(get_current_user)):
     """
     Protected endpoint to get current authenticated user info
@@ -123,8 +125,6 @@ def read_me(current_user = Depends(get_current_user)):
     """
     logger.info("Inside protected /me endpoint")
     return {
-        "user_id": current_user.id,
-        "email": current_user.email,
-        "first_name": current_user.first_name,
-        "last_name": current_user.last_name,
+        "id": current_user["id"],
+        "email": current_user["email"]
     }

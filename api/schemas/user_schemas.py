@@ -13,3 +13,7 @@ class UserLogin(BaseModel):
 class UserRegister(UserLogin):
     first_name: str
     last_name: str
+
+class UserResponse(BaseModel):
+    id: int
+    email: EmailStr

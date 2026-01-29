@@ -5,7 +5,7 @@ from jose import JWTError, jwt
 import datetime
 import logging
 
-from ..entities import user_entity as user_entity
+from ..entities import user_entity as user_entity   
 from config.settings import settings
 from ..utils.utils import hash_password, verify_password
 
@@ -147,7 +147,7 @@ def verify_access_token(token: str) -> dict:
     try:
         payload = jwt.decode(
             token,
-            settings.SECRET_Key,
+            settings.SECRET_KEY,
             algorithms=[settings.ALGORITHM],
         )
 
@@ -168,7 +168,7 @@ def verify_access_token(token: str) -> dict:
         raise InvalidCredentialsException()
     
 
-def get_current_user(token: str, db: Session) -> user_entity.UserRetrieve:
+def get_current_user(token: str, db: Session) -> dict:
     """
     Gets the current authenticated user from the JWT token
 
@@ -187,6 +187,9 @@ def get_current_user(token: str, db: Session) -> user_entity.UserRetrieve:
         logger.error("User not found for the given token")
         raise UserNotFoundException()
 
-    return user
+    return {
+        "id": user.id,
+        "email": user.email,
+    }
     
     

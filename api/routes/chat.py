@@ -26,12 +26,12 @@ Need methods for:
 - Adding a message to a chat
 """
 
-@router.get("/chats/{user_id}")
-def get_chats(user_id: int, db: Session = Depends(get_db)) -> List[chat_schemas.ChatResponse]:
+@router.get("/chats", response_model=List[chat_schemas.ChatResponse])
+def get_chats(user: dict = Depends(chat_service.get_current_user), db: Session = Depends(get_db)):
     """
     Retrieves all conversations for the authenticated user
 
-    :param user_id: The ID of the user whose conversations are being retrieved
+    :param user: The authenticated user object
     :param db: Database session dependency
 
     :return: List of chat meta data
@@ -39,10 +39,44 @@ def get_chats(user_id: int, db: Session = Depends(get_db)) -> List[chat_schemas.
     logger.info(f"Inside get_chats endpoint")
 
     logger.info("Fetching all chats from the service layer")
-    chats: List[chat_schemas.ChatResponse] = chat_service.get_all_chats(user_id, db)
+    chats: List[dict] = chat_service.get_all_chats(user["id"], db)
 
     if not chats:
         logger.info("No conversations found, returning empty list")
         return []
     
+    # convert list of dict to list of ChatResponse schemas
+    chats = [
+        chat_schemas.ChatResponse(
+            id=chat.get("id"),
+            user_id=chat.get("user_id"),
+            title=chat.get("title"),
+            created_at=chat.get("created_at"),
+        )
+        for chat in chats
+    ]
     return chats
+
+
+# creates a new chat
+@router.post("/chats", response_model=chat_schemas.ChatResponse)
+def create_chat(user: dict = Depends(chat_service.get_current_user), db: Session = Depends(get_db)):
+    """
+    Creates a new conversation for the authenticated user
+
+    :param user: The authenticated user object
+    :param db: Database session dependency
+
+    :return: The created chat object
+    """
+    logger.info(f"Inside create_chat endpoint")
+
+    logger.info("Creating a new chat in the service layer")
+    new_chat = chat_service.create_chat(user["id"], db)
+    # object containing the meta data of the newly created chat
+
+    return chat_schemas.ChatResponse(
+        id = new_chat.get("id"),
+        user_id = new_chat.get("user_id"),
+        title = new_chat.get("title")
+    )
