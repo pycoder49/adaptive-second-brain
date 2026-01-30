@@ -27,7 +27,7 @@ def get_chats_for_user(user_id: int, db: Session) -> List[chat_entity.ChatRetrie
     all_chats = all_chats.filter(models.Chat.user_id == user_id)
     all_chats = all_chats.order_by(models.Chat.created_at.desc()).all()
 
-    if not chat_entities:
+    if not all_chats:
         logger.info("No chats found in the database")
         return None
                                              
@@ -43,7 +43,6 @@ def get_chats_for_user(user_id: int, db: Session) -> List[chat_entity.ChatRetrie
     ]
 
     return chat_entities
-    
 
 def create_chat(user_id: int, db: Session) -> chat_entity.ChatRetrieve:
     """

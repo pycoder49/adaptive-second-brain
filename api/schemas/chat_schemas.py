@@ -10,7 +10,7 @@ class ChatCreate(BaseModel):
 
 
 class ChatResponse(ChatCreate):
-    created_at: datetime
+    pass
 
 
 class Message(BaseModel):

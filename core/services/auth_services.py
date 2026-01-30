@@ -168,7 +168,7 @@ def verify_access_token(token: str) -> dict:
         raise InvalidCredentialsException()
     
 
-def get_current_user(token: str, db: Session) -> dict:
+def get_current_user_from_token(token: str, db: Session) -> dict:
     """
     Gets the current authenticated user from the JWT token
 

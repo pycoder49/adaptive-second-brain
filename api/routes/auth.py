@@ -3,10 +3,10 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 import logging
 
-from ..schemas import user_schemas
+from ..schemas import user_schemas, auth_schemas
 from database.database import get_db
 
-from core.services import auth_service
+from core.services import auth_services
 
 from core.services.errors.user_errors import (
     InvalidCredentialsException, 
@@ -23,8 +23,8 @@ router = APIRouter(
 
 oauth_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
-@router.post("/login")
-def login(user_credentials: user_schemas.UserLogin, db: Session = Depends(get_db)) -> dict:
+@router.post("/login", response_model=auth_schemas.TokenResponse)
+def login(user_credentials: user_schemas.UserLogin, db: Session = Depends(get_db)):
     """
     Authenticates a user and returns user information upon successful login
     
@@ -39,11 +39,11 @@ def login(user_credentials: user_schemas.UserLogin, db: Session = Depends(get_db
     password = user_credentials.password
 
     try:
-        user_info = auth_service.authenticate_user(email, password, db)
+        user_info = auth_services.authenticate_user(email, password, db)
 
         # creating the jwt access token
         logger.info("Creating access token for authenticated user")
-        access_token = auth_service.create_access_token(
+        access_token = auth_services.create_access_token(
             data={
                 "user_id": user_info["user_id"], 
                 "email": user_info["email"],
@@ -75,7 +75,7 @@ def register(user_details: user_schemas.UserRegister, db: Session = Depends(get_
 
     try:
         logger.info("Calling auth_service.register_user")
-        user_info = auth_service.register_user(
+        user_info = auth_services.register_user(
             first_name = user_details.first_name,
             last_name = user_details.last_name,
             email = user_details.email,
@@ -95,7 +95,7 @@ def register(user_details: user_schemas.UserRegister, db: Session = Depends(get_
 def get_current_user(
         token: str = Depends(oauth_scheme),
         db: Session = Depends(get_db),
-):
+) -> dict:
     """
     Dependency to get current authenticated user from JWT token
     Use this in protected routes: current_user = Depends(get_current_user)
@@ -107,8 +107,8 @@ def get_current_user(
 
     # verify token and get current user
     try:
-        user = auth_service.get_current_user(token, db)
-        return user.id
+        user = auth_services.get_current_user_from_token(token, db)
+        return user
     except InvalidCredentialsException as e:
         logger.error("InvalidCredentialsException caught in get_current_user")
         raise HTTPException(status_code=401, detail=e.message, headers={"WWW-Authenticate": "Bearer"})

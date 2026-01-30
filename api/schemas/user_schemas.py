@@ -1,4 +1,3 @@
-from pydantic.types import conint
 from pydantic import BaseModel, EmailStr
 
 
