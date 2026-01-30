@@ -27,7 +27,7 @@ def get_chats_for_user(user_id: int, db: Session) -> List[chat_entity.ChatRetrie
     all_chats = all_chats.filter(models.Chat.user_id == user_id)
     all_chats = all_chats.order_by(models.Chat.created_at.desc()).all()
 
-    if not chat_entities:
+    if not all_chats:
         logger.info("No chats found in the database")
         return None
                                              
@@ -43,4 +43,33 @@ def get_chats_for_user(user_id: int, db: Session) -> List[chat_entity.ChatRetrie
     ]
 
     return chat_entities
-    
+
+def create_chat(user_id: int, db: Session) -> chat_entity.ChatRetrieve:
+    """
+    Creates a new chat entry in the database for the given user
+
+    :param user_id: The ID of the user for whom the chat is being created
+    :param db: Database session
+    :return: ChatRetrieve entity representing the created chat
+    """
+    logger.info("Inside chat_access.create_chat()")
+
+    # create a new chat entry
+    new_chat = models.Chat(
+        user_id = user_id,
+        title = "New Chat",
+    )
+
+    # add and commit to the database
+    db.add(new_chat)
+    db.commit()
+    db.refresh(new_chat)
+
+    # convert and return as ChatRetrieve entity
+    created_chat = chat_entity.ChatRetrieve(
+        id = new_chat.id,
+        user_id = new_chat.user_id,
+        title = new_chat.title,
+        created_at = new_chat.created_at,
+    )
+    return created_chat

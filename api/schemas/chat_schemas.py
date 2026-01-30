@@ -3,14 +3,13 @@ from typing import List, Optional
 from datetime import datetime
 
 
-class Chat(BaseModel):
+class ChatCreate(BaseModel):
     id: int
     user_id: int
     title: str
-    created_at: datetime
 
 
-class ChatResponse(Chat):
+class ChatResponse(ChatCreate):
     pass
 
 

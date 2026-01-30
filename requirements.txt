@@ -5,6 +5,7 @@ pgvector
 fastapi
 uvicorn
 pydantic[email]
+pydantic-settings
 bcrypt
 pyjwt
 
