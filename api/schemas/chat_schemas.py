@@ -10,13 +10,23 @@ class ChatCreate(BaseModel):
 
 
 class ChatResponse(ChatCreate):
-    pass
+    created_at: datetime
 
 
 class Message(BaseModel):
     id: int
-    chat_id: int
-    chunk_ids: Optional[List[int]]
     role: str
     content: str
+    parent_message_id: Optional[int] = None
     created_at: datetime
+
+
+class MessageCreate(BaseModel):
+    pass
+
+
+class MessageResponse(BaseModel):
+    # object containing chat meta data and list of messages
+    chat: ChatResponse
+    messages: List[Message]
+
