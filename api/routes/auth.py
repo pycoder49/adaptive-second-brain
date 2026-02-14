@@ -33,7 +33,6 @@ def login(user_credentials: user_schemas.UserLogin, db: Session = Depends(get_db
 
     :return: Dictionary containing user information if authentication is successful
     """
-    logger.info(f"Inside login endpoint")
     # call the auth_service layer within code (business) layer to authenticate user
     email = user_credentials.email
     password = user_credentials.password
@@ -71,8 +70,6 @@ def register(user_details: user_schemas.UserRegister, db: Session = Depends(get_
 
     :return: Dictionary containing user information upon successful registration
     """
-    logger.info(f"Inside register endpoint")
-
     try:
         logger.info("Calling auth_service.register_user")
         user_info = auth_services.register_user(
@@ -87,7 +84,6 @@ def register(user_details: user_schemas.UserRegister, db: Session = Depends(get_
         raise HTTPException(status_code=409, detail=e.message)
         # conflict error for existing user
     
-    logger.info("User registered successfully")
     return user_info
 
 
@@ -124,7 +120,8 @@ def read_me(current_user = Depends(get_current_user)):
     :return: Current user information
     """
     logger.info("Inside protected /me endpoint")
-    return {
+    response = {
         "id": current_user["id"],
         "email": current_user["email"]
     }
+    return response

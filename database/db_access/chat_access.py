@@ -12,6 +12,10 @@ from core.entities import chat_entity
 logger = logging.getLogger(__name__)
 
 
+"""
+Methods for accessing chat-related data in the database
+"""
+
 def get_chats_for_user(user_id: int, db: Session) -> List[chat_entity.ChatRetrieve] | None:
     """
     Retrieves all conversations' metadata from the database, ordered by creation date descending.
@@ -21,8 +25,7 @@ def get_chats_for_user(user_id: int, db: Session) -> List[chat_entity.ChatRetrie
 
     :return: List of ChatRetrieve entity objects
     """
-    logger.info("Inside chat_access.get_chats_for_user()")
-
+    logger.info(f"Querying to db for all chats for user_id: {user_id}")
     all_chats = db.query(models.Chat)
     all_chats = all_chats.filter(models.Chat.user_id == user_id)
     all_chats = all_chats.order_by(models.Chat.created_at.desc()).all()
@@ -44,6 +47,30 @@ def get_chats_for_user(user_id: int, db: Session) -> List[chat_entity.ChatRetrie
 
     return chat_entities
 
+
+def get_chat_data(chat_id: int, db: Session) -> chat_entity.ChatRetrieve | None:
+    """
+    Retrieves a single chat's metadata from the database by chat ID
+
+    :param chat_id: The ID of the chat being retrieved
+    :param db: Database session
+
+    :return: ChatRetrieve entity object if found, else None
+    """
+    logger.info(f"Querying to db for chat with id: {chat_id}")
+    chat = db.query(models.Chat).filter(models.Chat.id == chat_id).first()
+    if not chat:
+        return None
+    
+    chat_entity_obj = chat_entity.ChatRetrieve(
+        id = chat.id,
+        user_id = chat.user_id,
+        title = chat.title,
+        created_at = chat.created_at,
+    )
+    return chat_entity_obj
+
+
 def create_chat(user_id: int, db: Session) -> chat_entity.ChatRetrieve:
     """
     Creates a new chat entry in the database for the given user
@@ -52,8 +79,6 @@ def create_chat(user_id: int, db: Session) -> chat_entity.ChatRetrieve:
     :param db: Database session
     :return: ChatRetrieve entity representing the created chat
     """
-    logger.info("Inside chat_access.create_chat()")
-
     # create a new chat entry
     new_chat = models.Chat(
         user_id = user_id,
@@ -73,3 +98,36 @@ def create_chat(user_id: int, db: Session) -> chat_entity.ChatRetrieve:
         created_at = new_chat.created_at,
     )
     return created_chat
+
+
+"""
+Methods for accessing message-related data in the database
+"""
+
+def get_messages_for_chat(chat_id: int, db: Session) -> List[chat_entity.MessageRetrieve]:
+    """
+    Gets all messages for a specific chat from the database
+
+    :param chat_id: The ID of the chat whose messages are being retrieved
+    :param db: Database session
+
+    :return: List of MessageRetrieve entity objects
+    """
+    logger.info(f"Querying to db for all messages for chat_id: {chat_id}")
+
+    messages = db.query(models.Message).filter(models.Message.chat_id == chat_id)
+    messages = messages.order_by(models.Message.created_at.asc()).all()
+
+    # convert the list of messages to the internal data types
+    all_messages: List[chat_entity.MessageRetrieve] = [
+        chat_entity.MessageRetrieve(
+            id = message.id,
+            chat_id = message.chat_id,
+            role = message.role,
+            content = message.content,
+            parent_message_id = message.parent_message_id,
+            created_at = message.created_at,
+        )
+        for message in messages
+    ]
+    return all_messages

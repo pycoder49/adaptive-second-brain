@@ -25,12 +25,11 @@ def create_chat(user_id: int, db: Session) -> dict:
         "id": new_chat.id,
         "user_id": new_chat.user_id,
         "title": new_chat.title,
+        "created_at": new_chat.created_at,
     }
 
 
 def get_all_chats(user_id: int, db: Session) -> List[dict] | None:
-    logger.info("Inside chat_service.get_all_chats()")
-
     logger.info("Fetching all chats from the data access layer")
     all_chats: List[chat_entity.ChatRetrieve] = chat_access.get_chats_for_user(user_id, db)
 
@@ -51,13 +50,37 @@ def get_all_chats(user_id: int, db: Session) -> List[dict] | None:
     return chat_list
 
 
-def get_all_messages(db: Session, chat_id: int):
-    pass
+def get_chat_by_id(chat_id: int, db: Session) -> dict | None:
+    logger.info("Fetching chat by ID from the data access layer")
+    chat: chat_entity.ChatRetrieve = chat_access.get_chat_data(chat_id, db)
+    if not chat:
+        return None
+
+    return {
+        "id": chat.id,
+        "user_id": chat.user_id,
+        "title": chat.title,
+        "created_at": chat.created_at,
+    }
 
 
-def get_chat_by_id(db: Session, chat_id: int):
-    pass
+def get_all_messages(chat_id: int, db: Session) -> List[dict]:
+    logger.info("Fetching all messages for chat from the data access layer")
+    messages: List[chat_entity.MessageRetrieve] = chat_access.get_messages_for_chat(chat_id, db)
+
+    message_list: List[dict] = [
+        {
+            "id": message.id,
+            "chat_id": message.chat_id,
+            "role": message.role,
+            "content": message.content,
+            "parent_message_id": message.parent_message_id,
+            "created_at": message.created_at,
+        }
+        for message in messages
+    ]
+    return message_list
 
 
-def add_message_to_chat(db: Session, chat_id, role: str, content: str):
+def add_message_to_chat(chat_id: int, role: str, content: str, db: Session):
     pass

@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings
 from typing import Optional
 
+
 class Settings(BaseSettings):
     # database settings
     DB_HOST: str
@@ -16,5 +17,6 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = "./.env"
+    
     
 settings = Settings()

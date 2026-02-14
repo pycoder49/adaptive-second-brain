@@ -87,6 +87,7 @@ class Message(Base):
     chat_id = Column(Integer, ForeignKey("chats.id"), nullable=False)
     role = Column(Enum(Role), nullable=False)
     content = Column(String, nullable=False)
+    parent_message_id = Column(Integer, ForeignKey("messages.id"), nullable=True)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
 
 

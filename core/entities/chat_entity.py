@@ -15,3 +15,13 @@ class ChatCreate:
 class ChatRetrieve(ChatCreate):
     id: int
     created_at: str
+
+
+@dataclass
+class MessageRetrieve:
+    id: int
+    chat_id: int
+    role: str
+    content: str
+    parent_message_id: int | None
+    created_at: str
