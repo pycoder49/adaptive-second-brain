@@ -2,6 +2,8 @@ sqlalchemy
 psycopg2
 pgvector
 
+alembic
+
 fastapi
 uvicorn
 pydantic[email]
