@@ -106,6 +106,7 @@ def get_all_messages_for_chat(
 
     :return: List of messages in the chat
     """
+    logger.info(f"Retrieving all messages for chat ID {chat_id} from the service layer")
     # authentication via get_current_user dependency (done)
     # check if the chat exists
     chat = chat_services.get_chat_by_id(chat_id, db)
