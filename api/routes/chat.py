@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Response, status
+from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
 import logging
@@ -59,7 +59,6 @@ def get_chats(user: dict = Depends(get_current_user), db: Session = Depends(get_
         )
         for chat in chats
     ]
-
     return chats
 
 
@@ -84,7 +83,6 @@ def create_chat(user: dict = Depends(get_current_user), db: Session = Depends(ge
         title = new_chat.get("title"),
         created_at = new_chat.get("created_at"),
     )
-
     return response
 
 
