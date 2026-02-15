@@ -10,6 +10,8 @@ pydantic[email]
 pydantic-settings
 bcrypt
 pyjwt
+python-multipart
+aiofiles
 
 langchain
 langchain-community
