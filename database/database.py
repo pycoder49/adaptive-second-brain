@@ -3,7 +3,7 @@ from sqlalchemy.engine import URL
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from config import settings
+from config.settings import settings
 
 
 url = URL.create(
