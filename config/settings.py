@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
 
+    # OpenAI API key (hardcoded for now) until we add other LLM's
+    OPENAI_API_KEY: str = ""
+
     class Config:
         env_file = "./.env"
     

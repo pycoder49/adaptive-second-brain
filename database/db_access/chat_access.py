@@ -1,6 +1,4 @@
-"""
-This module talks to the database models related to chat functionality
-"""
+
 from sqlalchemy.orm import Session
 from typing import List
 import logging
@@ -12,19 +10,10 @@ from core.entities import chat_entity
 logger = logging.getLogger(__name__)
 
 
-"""
-Methods for accessing chat-related data in the database
-"""
+
 
 def get_chats_for_user(user_id: int, db: Session) -> List[chat_entity.ChatRetrieve] | None:
-    """
-    Retrieves all conversations' metadata from the database, ordered by creation date descending.
 
-    :param user_id: The ID of the user whose conversations are being retrieved
-    :param db: Database session
-
-    :return: List of ChatRetrieve entity objects
-    """
     logger.info(f"Querying to db for all chats for user_id: {user_id}")
     all_chats = db.query(models.Chat)
     all_chats = all_chats.filter(models.Chat.user_id == user_id)
@@ -49,14 +38,6 @@ def get_chats_for_user(user_id: int, db: Session) -> List[chat_entity.ChatRetrie
 
 
 def get_chat_data(chat_id: int, db: Session) -> chat_entity.ChatRetrieve | None:
-    """
-    Retrieves a single chat's metadata from the database by chat ID
-
-    :param chat_id: The ID of the chat being retrieved
-    :param db: Database session
-
-    :return: ChatRetrieve entity object if found, else None
-    """
     logger.info(f"Querying to db for chat with id: {chat_id}")
     chat = db.query(models.Chat).filter(models.Chat.id == chat_id).first()
     if not chat:
@@ -72,25 +53,15 @@ def get_chat_data(chat_id: int, db: Session) -> chat_entity.ChatRetrieve | None:
 
 
 def create_chat(user_id: int, db: Session) -> chat_entity.ChatRetrieve:
-    """
-    Creates a new chat entry in the database for the given user
-
-    :param user_id: The ID of the user for whom the chat is being created
-    :param db: Database session
-    :return: ChatRetrieve entity representing the created chat
-    """
-    # create a new chat entry
     new_chat = models.Chat(
         user_id = user_id,
         title = "New Chat",
     )
 
-    # add and commit to the database
     db.add(new_chat)
     db.commit()
     db.refresh(new_chat)
 
-    # convert and return as ChatRetrieve entity
     created_chat = chat_entity.ChatRetrieve(
         id = new_chat.id,
         user_id = new_chat.user_id,
@@ -100,19 +71,9 @@ def create_chat(user_id: int, db: Session) -> chat_entity.ChatRetrieve:
     return created_chat
 
 
-"""
-Methods for accessing message-related data in the database
-"""
+
 
 def get_messages_for_chat(chat_id: int, db: Session) -> List[chat_entity.MessageRetrieve]:
-    """
-    Gets all messages for a specific chat from the database
-
-    :param chat_id: The ID of the chat whose messages are being retrieved
-    :param db: Database session
-
-    :return: List of MessageRetrieve entity objects
-    """
     logger.info(f"Querying to db for all messages for chat_id: {chat_id}")
 
     messages = db.query(models.Message).filter(models.Message.chat_id == chat_id)
@@ -131,3 +92,40 @@ def get_messages_for_chat(chat_id: int, db: Session) -> List[chat_entity.Message
         for message in messages
     ]
     return all_messages
+
+
+def create_message(chat_id: int, role: str, content: str, db: Session) -> models.Message:
+    logger.info(f"Creating {role} message in chat {chat_id}")
+    role_enum = models.Role.USER if role == "user" else models.Role.AI
+    new_message = models.Message(
+        chat_id=chat_id,
+        role=role_enum,
+        content=content,
+    )
+    db.add(new_message)
+    db.commit()
+    db.refresh(new_message)
+    return new_message
+
+
+def link_documents_to_chat(chat_id: int, document_ids: list, db: Session) -> None:
+    logger.info(f"Linking documents {document_ids} to chat {chat_id}")
+    chat = db.query(models.Chat).filter(models.Chat.id == chat_id).first()
+    if not chat:
+        return
+
+    existing_doc_ids = {doc.id for doc in chat.documents}
+    for doc_id in document_ids:
+        if doc_id not in existing_doc_ids:
+            doc = db.query(models.Document).filter(models.Document.id == doc_id).first()
+            if doc:
+                chat.documents.append(doc)
+
+    db.commit()
+
+
+def get_document_ids_for_chat(chat_id: int, db: Session) -> list:
+    chat = db.query(models.Chat).filter(models.Chat.id == chat_id).first()
+    if not chat:
+        return []
+    return [doc.id for doc in chat.documents]

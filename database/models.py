@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, ARRAY, Float, Enum
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, ARRAY, Float, Enum, Table
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
@@ -20,6 +20,15 @@ class ProcessingStatus(enum.Enum):
 class Role(enum.Enum):
     USER = "user"
     AI = "ai"
+
+
+# Association table: links chats to documents (many-to-many)
+chat_documents = Table(
+    "chat_documents",
+    Base.metadata,
+    Column("chat_id", Integer, ForeignKey("chats.id", ondelete="CASCADE"), primary_key=True),
+    Column("document_id", Integer, ForeignKey("documents.id", ondelete="CASCADE"), primary_key=True),
+)
 
 
 class User(Base):
@@ -63,7 +72,7 @@ class Chunk(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     document_id = Column(Integer, ForeignKey("documents.id", ondelete="CASCADE"), nullable=False)
     content = Column(String, nullable=False)
-    embedding = Column(Vector)
+    embedding = Column(Vector(384))  # 384 dims for all-MiniLM-L6-v2
 
     # relationships
     document = relationship("Document", back_populates="chunks")
@@ -77,6 +86,10 @@ class Chat(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     title = Column(String, nullable=False, default="New Chat")
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
+
+    # relationships
+    documents = relationship("Document", secondary=chat_documents, backref="chats")
+    messages = relationship("Message", backref="chat", cascade="all, delete-orphan")
 
 
 class Message(Base):

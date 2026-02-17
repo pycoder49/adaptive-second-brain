@@ -22,11 +22,11 @@ class Message(BaseModel):
 
 
 class MessageCreate(BaseModel):
-    pass
+    content: str
+    document_ids: Optional[List[int]] = []
 
 
 class MessageResponse(BaseModel):
-    # object containing chat meta data and list of messages
     chat: ChatResponse
     messages: List[Message]
 

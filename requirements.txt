@@ -1,5 +1,6 @@
 sqlalchemy
-psycopg2
+psycopg2-binary
+#psycopg2
 pgvector
 
 alembic
@@ -8,11 +9,29 @@ fastapi
 uvicorn
 pydantic[email]
 pydantic-settings
+python-multipart
+
 bcrypt
 pyjwt
 
+pymupdf
+python-docx
 langchain
 langchain-community
+langchain-text-splitters
+#datetime
+sentence-transformers
+torch
 
-datetime
+openai
+anthropic
+google-generativeai
+groq
+
+cryptography
+
+python-dotenv
+
+streamlit
+requests
 
