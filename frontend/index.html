@@ -12,40 +12,58 @@
     </header>
 
     <main>
-        <section id="history-section">
-            <section id="search-chat">
-                <!-- drop down after input -->
+        <div id="chat-page">
+            <section id="history-section">
+                <section id="search-chat">
+                    <!-- drop down after input -->
+                    <label for="site-search">Search Chat:</label>
+                    <input type="search" id="site-search" name="site-search" placeholder="Search through chats">
+                    <button type="submit">Search</button>
+                    <!-- use searchTerms = mySearch.value -->
+                </section>
+                <section id="relevant-chats">
+                    <!-- show last 5 related -->
+                </section>
+                <section id="all-chats">   
+                    <!-- list all chats and be able to scroll down them -->
+                    <div class="scroll-container">
+                        <div class="scroll-page" id="page-1">chat 1</div>
+                        <div class="scroll-page" id="page-1">chat 2</div>
+                        <div class="scroll-page" id="page-1">chat 3</div>
+                    </div>
+                </section>
             </section>
-            <section id="relevant-chats">
-                <!-- show last 5 related -->
+            <section id="chat-section">
+                <section id="messages">
+                    <!-- need javascript here to help with interaction and pulling information -->
+                    
+                </section>
+                <form action="/prompt" method="post">
+                    <label for="prompt"></label>
+                    <textarea id="prompter-script" name="prompter-script" rows="10" cols="50" placeholder="Ask Anything"></textarea>
+                </form>
             </section>
-            <section id="all-chats">   
-                <!-- list all chats and be able to scroll down them -->
+            <section id="file-management-section">
+                <section id="file-search"> 
+                    <!-- dropdown file -->
+                    <label for="site-search">Search Chat:</label>
+                    <input type="search" id="site-search" name="site-search" placeholder="Search through chats">
+                    <button type="submit">Search</button>
+                </section>
+                <section id="file-layout">
+                    <!-- draw out layer -->
+                    <!-- if there are multiple files we need to write directory followed by file name -->
+                </section>
+                <section id="recent-files">
+                    <!-- load 3 files last used -->
+                    
+                </section>
+                <section id="drag-drop">
+                    <!-- drop and files here -->
+                    
+                </section>
             </section>
-        </section>
-        <section id="chat-section">
-            <section id="messages">
-                <!-- need javascript here to help with interaction and pulling information -->
-            </section>
-            <form action="/prompt" method="post">
-                <label for="prompt"></label>
-                <textarea id="prompter-script" name="prompter-script" rows="10" cols="50" placeholder="Ask Anything"></textarea>
-            </form>
-        </section>
-        <section id="file-management-section">
-            <section id="file-search"> 
-                <!-- dropdown file -->
-            </section>
-            <section id="file-layout">
-                <!-- draw out layer -->
-            </section>
-            <section id="recent-files">
-                <!-- load 3 files last used -->
-            </section>
-            <section id="drag-drop">
-                <!-- drop and files here -->
-            </section>
-        </section>
+        </div>
     </main>
 
     <footer>

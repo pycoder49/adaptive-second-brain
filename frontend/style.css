@@ -1,0 +1,29 @@
+#chat-page{
+  display: grid;
+  grid-template-columns: 20% 60% 20%;
+
+}
+
+#chat-section{
+  display: grid;
+}
+
+/*  */
+.scroll-container {
+  display: block;
+  margin: 0 auto;
+  text-align: center;
+}
+.scroll-container {
+  width: 200px;
+  height: 200px;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+}
+.scroll-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 5em;
+}
