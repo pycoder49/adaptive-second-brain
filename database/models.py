@@ -45,7 +45,9 @@ class Document(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     filename = Column(String, nullable=False)
-    upload_date = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    content_type = Column(String, nullable=False)
+    file_size = Column(Integer, nullable=False)
+    upload_time = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     processing_status = Column(
         Enum(ProcessingStatus), 
         default=ProcessingStatus.PROCESSING, nullable=False
@@ -87,7 +89,6 @@ class Message(Base):
     chat_id = Column(Integer, ForeignKey("chats.id"), nullable=False)
     role = Column(Enum(Role), nullable=False)
     content = Column(String, nullable=False)
-    parent_message_id = Column(Integer, ForeignKey("messages.id"), nullable=True)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
 
 
