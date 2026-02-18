@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Response, status
+from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
 import logging
@@ -59,7 +59,6 @@ def get_chats(user: dict = Depends(get_current_user), db: Session = Depends(get_
         )
         for chat in chats
     ]
-
     return chats
 
 
@@ -84,7 +83,6 @@ def create_chat(user: dict = Depends(get_current_user), db: Session = Depends(ge
         title = new_chat.get("title"),
         created_at = new_chat.get("created_at"),
     )
-
     return response
 
 
@@ -108,6 +106,7 @@ def get_all_messages_for_chat(
 
     :return: List of messages in the chat
     """
+    logger.info(f"Retrieving all messages for chat ID {chat_id} from the service layer")
     # authentication via get_current_user dependency (done)
     # check if the chat exists
     chat = chat_services.get_chat_by_id(chat_id, db)

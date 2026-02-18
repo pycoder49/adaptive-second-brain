@@ -41,7 +41,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-# uvircorn api.main:app --reload        for local testing
+# uvicorn api.main:app --reload        for local testing
 
 # defining CORS origins
 origins = ["*"]
@@ -64,3 +64,7 @@ app.include_router(users.router)
 @app.get("/")
 async def root():
     return {"message": "Welcome to the Adaptive Second Brain API!"}
+
+
+# TODO: Figure out a way to show messages when retriving messagse given chat id
+
