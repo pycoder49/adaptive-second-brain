@@ -74,7 +74,6 @@ def get_all_messages(chat_id: int, db: Session) -> List[dict]:
             "chat_id": message.chat_id,
             "role": message.role,
             "content": message.content,
-            "parent_message_id": message.parent_message_id,
             "created_at": message.created_at,
         }
         for message in messages
@@ -82,5 +81,20 @@ def get_all_messages(chat_id: int, db: Session) -> List[dict]:
     return message_list
 
 
-def add_message_to_chat(chat_id: int, role: str, content: str, db: Session):
-    pass
+def post_message_to_chat(chat_id: int, role: str, content: str, db: Session) -> dict:
+    logger.info("Posting message to chat via the data access layer")
+    new_message: chat_entity.MessageRetrieve = chat_access.post_message_to_chat(
+        chat_id = chat_id,
+        role = role,
+        content = content,
+        db = db,
+    )
+    
+    return {
+        "id": new_message.id,
+        "chat_id": new_message.chat_id,
+        "role": new_message.role,
+        "content": new_message.content,
+        "created_at": new_message.created_at,
+    }
+

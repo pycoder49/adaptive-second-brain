@@ -125,9 +125,40 @@ def get_messages_for_chat(chat_id: int, db: Session) -> List[chat_entity.Message
             chat_id = message.chat_id,
             role = message.role,
             content = message.content,
-            parent_message_id = message.parent_message_id,
             created_at = message.created_at,
         )
         for message in messages
     ]
     return all_messages
+
+
+def post_message_to_chat(chat_id: int, role: str, content: str, db: Session) -> chat_entity.MessageRetrieve:
+    """
+    Posts a new message to a specific chat in the database
+    
+    :param chat_id: The ID of the chat to which the message is being posted
+    :param role: The role of the message sender (e.g., "user", "assistant")
+    :param content: The content of the message being posted
+    :param db: Database session
+
+    :return: MessageRetrieve entity representing the newly posted message
+    """
+    logger.info("Creating new message entry in the database")
+    message_entry = models.Message(
+        chat_id = chat_id,
+        role = role,
+        content = content,
+    )
+
+    db.add(message_entry)
+    db.commit()
+    db.refresh(message_entry)
+
+    new_message = chat_entity.MessageRetrieve(
+        id = message_entry.id,
+        chat_id = message_entry.chat_id,
+        role = message_entry.role,
+        content = message_entry.content,
+        created_at = message_entry.created_at,
+    )
+    return new_message

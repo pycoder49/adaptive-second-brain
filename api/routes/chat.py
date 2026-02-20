@@ -116,35 +116,104 @@ def get_all_messages_for_chat(
 
     # check if the user has access to the chat
     if chat.get("user_id") != user["id"]:
-        logger.error(f"User {user['id']} unauthorized to access chat {chat_id}")
+        logger.error(f"User {user['id']} is unauthorized to access chat {chat_id}")
         raise HTTPException(status_code=403, detail="Unauthorized access to chat")
     
-    logger.info(f"Fetching messages and chat data for chat ID {chat_id} from the service layer")
     # fetch chat meta data from the service layer
-    chat_meta_data: dict = chat_services.get_chat_by_id(chat_id, db)
+    # chat data is already fetched above in the variable: chat
 
     # fetch all messages for the chat from the service layer
     all_messages: List[dict] = chat_services.get_all_messages(chat_id, db)
 
     # construct and return the response object
-    response = chat_schemas.MessageResponse(
-        chat = chat_schemas.ChatResponse(
-            id = chat_meta_data.get("id"),
-            user_id = chat_meta_data.get("user_id"),
-            title = chat_meta_data.get("title"),
-            created_at = chat_meta_data.get("created_at"),
-        ),
-        messages = [
-            chat_schemas.Message(
-                id = message.get("id"),
-                role = message.get("role"),
-                content = message.get("content"),
-                parent_message_id = message.get("parent_message_id"),
-                created_at = message.get("created_at"),
-            )
-            for message in all_messages
-        ]
+    chat_response = chat_schemas.ChatResponse(
+        id = chat.get("id"),
+        user_id = chat.get("user_id"),
+        title = chat.get("title"),
+        created_at = chat.get("created_at"),
     )
-    return response
+    user_messages = [
+        chat_schemas.Message(
+            id = message.get("id"),
+            role = message.get("role"),
+            content = message.get("content"),
+            created_at = message.get("created_at"),
+        )
+        for message in all_messages
+    ]
+
+    # returning the assistant response in the response object
+    return chat_schemas.MessageResponse(
+        chat = chat_response,
+        messages = user_messages,
+    )
 
 
+# post a new message to a specific chat
+@router.post("/{chat_id}/message", response_model=List[chat_schemas.Message])
+def post_message_to_chat(
+    chat_id: int,
+    message: chat_schemas.MessageCreate,
+    user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Posts a new message to a specific chat
+    
+    :param chat_id: The ID of the chat to which the message is being posted
+    :param content: The content of the message being posted as a string
+    :param user: The authenticated user object
+    :param db: Database session dependency
+
+    :return: The created message object
+    """
+    logger.info(f"Posting a new message to chat ID {chat_id} from the service layer")
+
+    # authentication via get_current_user dependency (done)
+    # check if the chat exists -- could be optimized later so we don't havee to make multiple checks every time
+    chat = chat_services.get_chat_by_id(chat_id, db)
+    if not chat:
+        logger.error(f"Chat with ID {chat_id} not found")
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    # check if the user has access to the chat
+    if chat.get("user_id") != user["id"]:
+        logger.error(f"User {user['id']} is unauthorized to access chat {chat_id}")
+        raise HTTPException(status_code=403, detail="Unauthorized access to chat")
+
+    # Add the message to the db via the service layer
+    new_message = chat_services.post_message_to_chat(
+        chat_id = chat_id,
+        role = "user",
+        content = message.content,
+        db = db,
+    )
+
+    # sending message to the rag inference engine via the service layer
+    rag_response: str
+    rag_response = "This is a placeholder response for now"
+    # rag_response = rag_inference_engine.get_response(content)
+
+    # adding the assistnat response to the db via the service layer
+    assistant_response = chat_services.post_message_to_chat(
+        chat_id = chat_id,
+        role = "ai",
+        content = rag_response,
+        db = db,
+    )
+
+    # returning the assistant response in the response object
+    return [
+        chat_schemas.Message(
+            id = new_message.get("id"),
+            role = new_message.get("role"),
+            content = new_message.get("content"),
+            created_at = new_message.get("created_at"),
+        ),
+        chat_schemas.Message(
+            id = assistant_response.get("id"),
+            role = assistant_response.get("role"),
+            content = assistant_response.get("content"),
+            created_at = assistant_response.get("created_at"),
+        )
+    ]

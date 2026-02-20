@@ -23,5 +23,4 @@ class MessageRetrieve:
     chat_id: int
     role: str
     content: str
-    parent_message_id: int | None
     created_at: str

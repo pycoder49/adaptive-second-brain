@@ -17,12 +17,11 @@ class Message(BaseModel):
     id: int
     role: str
     content: str
-    parent_message_id: Optional[int] = None
     created_at: datetime
 
 
 class MessageCreate(BaseModel):
-    pass
+    content: str
 
 
 class MessageResponse(BaseModel):
