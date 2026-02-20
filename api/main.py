@@ -65,6 +65,3 @@ app.include_router(users.router)
 async def root():
     return {"message": "Welcome to the Adaptive Second Brain API!"}
 
-
-# TODO: Figure out a way to show messages when retriving messagse given chat id
-
