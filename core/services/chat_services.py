@@ -9,6 +9,7 @@ from core.entities import chat_entity
 logger = logging.getLogger(__name__)
 
 
+# add a single chat for the current user
 def create_chat(user_id: int, db: Session) -> dict:
     """
     Creates a new chat for the given user in the database.
@@ -28,6 +29,7 @@ def create_chat(user_id: int, db: Session) -> dict:
     }
 
 
+# get all chats for the current user
 def get_all_chats(user_id: int, db: Session) -> List[dict] | None:
     logger.info("Fetching all chats from the data access layer")
     all_chats: List[chat_entity.ChatRetrieve] = chat_access.get_chats_for_user(user_id, db)
@@ -49,6 +51,7 @@ def get_all_chats(user_id: int, db: Session) -> List[dict] | None:
     return chat_list
 
 
+# get a single chat by ID
 def get_chat_by_id(chat_id: int, db: Session) -> dict | None:
     logger.info("Fetching chat by ID from the data access layer")
     chat: chat_entity.ChatRetrieve = chat_access.get_chat_data(chat_id, db)
@@ -63,6 +66,7 @@ def get_chat_by_id(chat_id: int, db: Session) -> dict | None:
     }
 
 
+# get all messages for a chat
 def get_all_messages(chat_id: int, db: Session) -> List[dict]:
     logger.info("Fetching all messages for chat from the data access layer")
     messages: List[chat_entity.MessageRetrieve] = chat_access.get_messages_for_chat(chat_id, db)
@@ -80,6 +84,7 @@ def get_all_messages(chat_id: int, db: Session) -> List[dict]:
     return message_list
 
 
+# get all messages for a chat
 def post_message_to_chat(chat_id: int, content: str, db: Session) -> tuple[dict, dict]:
     logger.info("Posting message to chat via the data access layer")
     new_message: chat_entity.MessageRetrieve = chat_access.post_message_to_chat(

@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 Methods for accessing chat-related data in the database
 """
 
+# retrieves all chats for a specific user from the db
 def get_chats_for_user(user_id: int, db: Session) -> List[chat_entity.ChatRetrieve] | None:
     """
     Retrieves all conversations' metadata from the database, ordered by creation date descending.
@@ -48,6 +49,7 @@ def get_chats_for_user(user_id: int, db: Session) -> List[chat_entity.ChatRetrie
     return chat_entities
 
 
+# retrieves a single chat's meta data from the db by chat ID
 def get_chat_data(chat_id: int, db: Session) -> chat_entity.ChatRetrieve | None:
     """
     Retrieves a single chat's metadata from the database by chat ID
@@ -71,6 +73,7 @@ def get_chat_data(chat_id: int, db: Session) -> chat_entity.ChatRetrieve | None:
     return chat_entity_obj
 
 
+# method to create a new chat entry in the db for a given user
 def create_chat(user_id: int, db: Session) -> chat_entity.ChatRetrieve:
     """
     Creates a new chat entry in the database for the given user
@@ -103,7 +106,7 @@ def create_chat(user_id: int, db: Session) -> chat_entity.ChatRetrieve:
 """
 Methods for accessing message-related data in the database
 """
-
+# retrieves all messages for a specific chat
 def get_messages_for_chat(chat_id: int, db: Session) -> List[chat_entity.MessageRetrieve]:
     """
     Gets all messages for a specific chat from the database
@@ -131,7 +134,7 @@ def get_messages_for_chat(chat_id: int, db: Session) -> List[chat_entity.Message
     ]
     return all_messages
 
-
+# add a new entry to the messages table for a specific chat
 def post_message_to_chat(chat_id: int, role: str, content: str, db: Session) -> chat_entity.MessageRetrieve:
     """
     Posts a new message to a specific chat in the database

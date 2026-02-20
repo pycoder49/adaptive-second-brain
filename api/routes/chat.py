@@ -32,6 +32,7 @@ Need methods for:
 """
 Endpoints for chat management
 """
+# get all chats for the current user
 @router.get("/", response_model=List[chat_schemas.ChatResponse])
 def get_chats(user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
     """
