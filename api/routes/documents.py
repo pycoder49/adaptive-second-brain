@@ -24,15 +24,6 @@ async def upload_document(
     user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """
-    Uploads a document (PDF or DOCX), parses it, chunks it,
-    generates embeddings, and stores everything in pgvector.
-
-    :param file: The uploaded file
-    :param user: Authenticated user
-    :param db: Database session
-    :return: Document metadata
-    """
     # validate file type
     if not file.filename:
         raise HTTPException(status_code=400, detail="No filename provided")
@@ -64,13 +55,7 @@ def get_documents(
     user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """
-    Retrieves all documents for the authenticated user.
 
-    :param user: Authenticated user
-    :param db: Database session
-    :return: List of document metadata
-    """
     return document_services.get_user_documents(user["id"], db)
 
 
@@ -80,13 +65,7 @@ def delete_document(
     user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """
-    Deletes a document and all its chunks.
 
-    :param doc_id: The document ID to delete
-    :param user: Authenticated user
-    :param db: Database session
-    """
     deleted = document_services.delete_user_document(user["id"], doc_id, db)
     if not deleted:
         raise HTTPException(status_code=404, detail="Document not found or unauthorized")
