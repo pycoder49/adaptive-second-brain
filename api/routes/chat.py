@@ -182,23 +182,9 @@ def post_message_to_chat(
         raise HTTPException(status_code=403, detail="Unauthorized access to chat")
 
     # Add the message to the db via the service layer
-    new_message = chat_services.post_message_to_chat(
+    new_message, assistant_response = chat_services.post_message_to_chat(
         chat_id = chat_id,
-        role = "user",
         content = message.content,
-        db = db,
-    )
-
-    # sending message to the rag inference engine via the service layer
-    rag_response: str
-    rag_response = "This is a placeholder response for now"
-    # rag_response = rag_inference_engine.get_response(content)
-
-    # adding the assistnat response to the db via the service layer
-    assistant_response = chat_services.post_message_to_chat(
-        chat_id = chat_id,
-        role = "ai",
-        content = rag_response,
         db = db,
     )
 

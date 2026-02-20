@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
 from typing import List
-import datetime
 import logging
 
 from database.db_access import chat_access
@@ -81,12 +80,23 @@ def get_all_messages(chat_id: int, db: Session) -> List[dict]:
     return message_list
 
 
-def post_message_to_chat(chat_id: int, role: str, content: str, db: Session) -> dict:
+def post_message_to_chat(chat_id: int, content: str, db: Session) -> tuple[dict, dict]:
     logger.info("Posting message to chat via the data access layer")
     new_message: chat_entity.MessageRetrieve = chat_access.post_message_to_chat(
         chat_id = chat_id,
-        role = role,
+        role = "user",
         content = content,
+        db = db,
+    )
+
+    # sending message to the rag inference engine via the service layer
+    rag_response: str = "This is a placeholder response for now"
+    # rag_response: str = rag_inference_engine.get_response(content)
+
+    assistant_response = chat_access.post_message_to_chat(
+        chat_id = chat_id,
+        role = "ai",
+        content = rag_response,
         db = db,
     )
     
@@ -96,5 +106,11 @@ def post_message_to_chat(chat_id: int, role: str, content: str, db: Session) -> 
         "role": new_message.role,
         "content": new_message.content,
         "created_at": new_message.created_at,
+    }, {
+        "id": assistant_response.id,
+        "chat_id": assistant_response.chat_id,
+        "role": assistant_response.role,
+        "content": assistant_response.content,
+        "created_at": assistant_response.created_at,
     }
 
