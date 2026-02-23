@@ -9,17 +9,13 @@ import datetime
 import enum
 
 from .database import Base
+from core.entities.chat_entity import Role
 
 
 class ProcessingStatus(enum.Enum):
     READY = "ready"
     PROCESSING = "processing"
     FAILED = "failed"
-
-
-class Role(enum.Enum):
-    USER = "user"
-    AI = "ai"
 
 
 class User(Base):
