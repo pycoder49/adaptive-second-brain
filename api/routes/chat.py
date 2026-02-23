@@ -185,6 +185,7 @@ def post_message_to_chat(
     # Add the message to the db via the service layer
     new_message, assistant_response = chat_services.post_message_to_chat(
         chat_id = chat_id,
+        user_id = user["id"],
         content = message.content,
         db = db,
     )

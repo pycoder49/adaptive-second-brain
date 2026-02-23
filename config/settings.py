@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
 
+    # RAG settings
+    # Options: "placeholder" | "dev" | "production"
+    RAG_IMPLEMENTATION: str = "placeholder"
+
     class Config:
         env_file = "./.env"
     
