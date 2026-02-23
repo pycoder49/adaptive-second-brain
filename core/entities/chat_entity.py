@@ -3,6 +3,12 @@ Database entities for Chat functionality
 """
 
 from dataclasses import dataclass
+import enum
+
+
+class Role(enum.Enum):
+    USER = "user"
+    AI = "ai"
 
 
 @dataclass

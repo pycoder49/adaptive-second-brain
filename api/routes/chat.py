@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Body
 from sqlalchemy.orm import Session
 from typing import List
 import logging
@@ -154,7 +154,7 @@ def get_all_messages_for_chat(
 @router.post("/{chat_id}/message", response_model=List[chat_schemas.Message])
 def post_message_to_chat(
     chat_id: int,
-    message: chat_schemas.MessageCreate,
+    message: chat_schemas.MessageCreate = Body(...),
     user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
