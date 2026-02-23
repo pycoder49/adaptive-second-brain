@@ -5,6 +5,7 @@ import logging
 from database.db_access import chat_access
 from core.entities import chat_entity
 from core.entities.chat_entity import Role
+from core.RAG.rag_factory import get_rag_engine
 
 
 logger = logging.getLogger(__name__)
@@ -86,7 +87,7 @@ def get_all_messages(chat_id: int, db: Session) -> List[dict]:
 
 
 # get all messages for a chat
-def post_message_to_chat(chat_id: int, content: str, db: Session) -> tuple[dict, dict]:
+def post_message_to_chat(chat_id: int, user_id: int, content: str, db: Session) -> tuple[dict, dict]:
     logger.info("Posting message to chat via the data access layer")
     new_message: chat_entity.MessageRetrieve = chat_access.post_message_to_chat(
         chat_id = chat_id,
@@ -96,8 +97,8 @@ def post_message_to_chat(chat_id: int, content: str, db: Session) -> tuple[dict,
     )
 
     # sending message to the rag inference engine via the service layer
-    rag_response: str = "This is a placeholder response for now"
-    # rag_response: str = rag_inference_engine.get_response(content)
+    rag_engine = get_rag_engine()
+    rag_response: str = rag_engine.get_response(user_id=user_id, query=content)
 
     assistant_response = chat_access.post_message_to_chat(
         chat_id = chat_id,
