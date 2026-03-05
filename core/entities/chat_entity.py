@@ -3,6 +3,12 @@ Database entities for Chat functionality
 """
 
 from dataclasses import dataclass
+import enum
+
+
+class Role(enum.Enum):
+    USER = "user"
+    AI = "ai"
 
 
 @dataclass
@@ -23,5 +29,4 @@ class MessageRetrieve:
     chat_id: int
     role: str
     content: str
-    parent_message_id: int | None
     created_at: str

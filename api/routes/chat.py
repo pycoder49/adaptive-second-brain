@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Response, status
+from fastapi import APIRouter, HTTPException, Depends, Body
 from sqlalchemy.orm import Session
 from typing import List
 import logging
@@ -18,9 +18,12 @@ router = APIRouter(
 )
 
 
+"""
+Endpoints for chat management
+"""
 
 
-
+# get all chats for the current user
 @router.get("/", response_model=List[chat_schemas.ChatResponse])
 def get_chats(user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
     logger.info("Fetching all chats from the service layer")
@@ -39,7 +42,6 @@ def get_chats(user: dict = Depends(get_current_user), db: Session = Depends(get_
         )
         for chat in chats
     ]
-
     return chats
 
 
@@ -54,10 +56,7 @@ def create_chat(user: dict = Depends(get_current_user), db: Session = Depends(ge
         title = new_chat.get("title"),
         created_at = new_chat.get("created_at"),
     )
-
     return response
-
-
 
 
 @router.get("/{chat_id}", response_model=chat_schemas.MessageResponse)
@@ -66,6 +65,15 @@ def get_all_messages_for_chat(
     user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    """
+    Retrieves all messages for a specific chat.
+
+    :param chat_id: The ID of the chat whose messages are being retrieved
+    :param user: The authenticated user object
+    :param db: Database session dependency
+    :return: List of messages in the chat
+    """
+    logger.info(f"Retrieving all messages for chat ID {chat_id} from the service layer")
 
     chat = chat_services.get_chat_by_id(chat_id, db)
     if not chat:
@@ -73,33 +81,32 @@ def get_all_messages_for_chat(
         raise HTTPException(status_code=404, detail="Chat not found")
 
     if chat.get("user_id") != user["id"]:
-        logger.error(f"User {user['id']} unauthorized to access chat {chat_id}")
+        logger.error(f"User {user['id']} is unauthorized to access chat {chat_id}")
         raise HTTPException(status_code=403, detail="Unauthorized access to chat")
-    
-    logger.info(f"Fetching messages and chat data for chat ID {chat_id} from the service layer")
-    chat_meta_data: dict = chat_services.get_chat_by_id(chat_id, db)
 
     all_messages: List[dict] = chat_services.get_all_messages(chat_id, db)
 
-    response = chat_schemas.MessageResponse(
-        chat = chat_schemas.ChatResponse(
-            id = chat_meta_data.get("id"),
-            user_id = chat_meta_data.get("user_id"),
-            title = chat_meta_data.get("title"),
-            created_at = chat_meta_data.get("created_at"),
-        ),
-        messages = [
-            chat_schemas.Message(
-                id = message.get("id"),
-                role = message.get("role"),
-                content = message.get("content"),
-                parent_message_id = message.get("parent_message_id"),
-                created_at = message.get("created_at"),
-            )
-            for message in all_messages
-        ]
+    # construct and return the response object
+    chat_response = chat_schemas.ChatResponse(
+        id = chat.get("id"),
+        user_id = chat.get("user_id"),
+        title = chat.get("title"),
+        created_at = chat.get("created_at"),
     )
-    return response
+    user_messages = [
+        chat_schemas.Message(
+            id = message.get("id"),
+            role = message.get("role"),
+            content = message.get("content"),
+            created_at = message.get("created_at"),
+        )
+        for message in all_messages
+    ]
+
+    return chat_schemas.MessageResponse(
+        chat = chat_response,
+        messages = user_messages,
+    )
 
 
 @router.post("/{chat_id}/message")
@@ -109,6 +116,15 @@ def send_message(
     user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Posts a new message to a specific chat and gets an AI response.
+
+    :param chat_id: The ID of the chat to which the message is being posted
+    :param message: The message content and optional document_ids
+    :param user: The authenticated user object
+    :param db: Database session dependency
+    :return: The AI response message
+    """
     chat = chat_services.get_chat_by_id(chat_id, db)
     if not chat:
         raise HTTPException(status_code=404, detail="Chat not found")

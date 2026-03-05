@@ -13,13 +13,16 @@ python-multipart
 
 bcrypt
 pyjwt
+python-multipart
+aiofiles
 
 pymupdf
 python-docx
 langchain
 langchain-community
 langchain-text-splitters
-#datetime
+langchain-openai
+chromadb
 sentence-transformers
 torch
 

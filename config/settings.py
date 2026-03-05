@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     # OpenAI API key (hardcoded for now) until we add other LLM's
     OPENAI_API_KEY: str = ""
 
+    # RAG settings
+    # Options: "placeholder" | "dev" | "production"
+    RAG_IMPLEMENTATION: str = "placeholder"
+
     class Config:
         env_file = "./.env"
     

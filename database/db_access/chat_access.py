@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 
+# retrieves all chats for a specific user from the db
 def get_chats_for_user(user_id: int, db: Session) -> List[chat_entity.ChatRetrieve] | None:
 
     logger.info(f"Querying to db for all chats for user_id: {user_id}")
@@ -37,6 +38,7 @@ def get_chats_for_user(user_id: int, db: Session) -> List[chat_entity.ChatRetrie
     return chat_entities
 
 
+# retrieves a single chat's meta data from the db by chat ID
 def get_chat_data(chat_id: int, db: Session) -> chat_entity.ChatRetrieve | None:
     logger.info(f"Querying to db for chat with id: {chat_id}")
     chat = db.query(models.Chat).filter(models.Chat.id == chat_id).first()
@@ -52,6 +54,7 @@ def get_chat_data(chat_id: int, db: Session) -> chat_entity.ChatRetrieve | None:
     return chat_entity_obj
 
 
+# method to create a new chat entry in the db for a given user
 def create_chat(user_id: int, db: Session) -> chat_entity.ChatRetrieve:
     new_chat = models.Chat(
         user_id = user_id,
@@ -72,7 +75,12 @@ def create_chat(user_id: int, db: Session) -> chat_entity.ChatRetrieve:
 
 
 
+"""
+Methods for accessing message-related data in the database
+"""
 
+
+# retrieves all messages for a specific chat
 def get_messages_for_chat(chat_id: int, db: Session) -> List[chat_entity.MessageRetrieve]:
     logger.info(f"Querying to db for all messages for chat_id: {chat_id}")
 
@@ -86,7 +94,6 @@ def get_messages_for_chat(chat_id: int, db: Session) -> List[chat_entity.Message
             chat_id = message.chat_id,
             role = message.role,
             content = message.content,
-            parent_message_id = message.parent_message_id,
             created_at = message.created_at,
         )
         for message in messages
@@ -95,6 +102,7 @@ def get_messages_for_chat(chat_id: int, db: Session) -> List[chat_entity.Message
 
 
 def create_message(chat_id: int, role: str, content: str, db: Session) -> models.Message:
+    """Creates a new message entry in the database."""
     logger.info(f"Creating {role} message in chat {chat_id}")
     role_enum = models.Role.USER if role == "user" else models.Role.AI
     new_message = models.Message(
@@ -109,6 +117,7 @@ def create_message(chat_id: int, role: str, content: str, db: Session) -> models
 
 
 def link_documents_to_chat(chat_id: int, document_ids: list, db: Session) -> None:
+    """Links documents to a chat (many-to-many)."""
     logger.info(f"Linking documents {document_ids} to chat {chat_id}")
     chat = db.query(models.Chat).filter(models.Chat.id == chat_id).first()
     if not chat:
@@ -125,6 +134,7 @@ def link_documents_to_chat(chat_id: int, document_ids: list, db: Session) -> Non
 
 
 def get_document_ids_for_chat(chat_id: int, db: Session) -> list:
+    """Returns all document IDs linked to a given chat."""
     chat = db.query(models.Chat).filter(models.Chat.id == chat_id).first()
     if not chat:
         return []

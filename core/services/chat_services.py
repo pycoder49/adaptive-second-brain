@@ -1,18 +1,20 @@
 from sqlalchemy.orm import Session
 from typing import List
-import datetime
 import logging
 
 from database.db_access import chat_access
 from database.db_access import document_access
 from database import models
 from core.entities import chat_entity
+from core.entities.chat_entity import Role
 from core.RAG.main import query_rag
+from core.RAG.rag_factory import get_rag_engine
 
 
 logger = logging.getLogger(__name__)
 
 
+# add a single chat for the current user
 def create_chat(user_id: int, db: Session) -> dict:
     new_chat = chat_access.create_chat(user_id, db)
 
@@ -24,6 +26,7 @@ def create_chat(user_id: int, db: Session) -> dict:
     }
 
 
+# get all chats for the current user
 def get_all_chats(user_id: int, db: Session) -> List[dict] | None:
     logger.info("Fetching all chats from the data access layer")
     all_chats: List[chat_entity.ChatRetrieve] = chat_access.get_chats_for_user(user_id, db)
@@ -45,6 +48,7 @@ def get_all_chats(user_id: int, db: Session) -> List[dict] | None:
     return chat_list
 
 
+# get a single chat by ID
 def get_chat_by_id(chat_id: int, db: Session) -> dict | None:
     logger.info("Fetching chat by ID from the data access layer")
     chat: chat_entity.ChatRetrieve = chat_access.get_chat_data(chat_id, db)
@@ -59,6 +63,7 @@ def get_chat_by_id(chat_id: int, db: Session) -> dict | None:
     }
 
 
+# get all messages for a chat
 def get_all_messages(chat_id: int, db: Session) -> List[dict]:
     logger.info("Fetching all messages for chat from the data access layer")
     messages: List[chat_entity.MessageRetrieve] = chat_access.get_messages_for_chat(chat_id, db)
@@ -69,7 +74,6 @@ def get_all_messages(chat_id: int, db: Session) -> List[dict]:
             "chat_id": message.chat_id,
             "role": message.role,
             "content": message.content,
-            "parent_message_id": message.parent_message_id,
             "created_at": message.created_at,
         }
         for message in messages
@@ -84,7 +88,6 @@ def add_message_to_chat(chat_id: int, role: str, content: str, db: Session) -> d
         "chat_id": message.chat_id,
         "role": message.role.value if hasattr(message.role, 'value') else message.role,
         "content": message.content,
-        "parent_message_id": message.parent_message_id,
         "created_at": message.created_at,
     }
 
