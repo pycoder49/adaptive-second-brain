@@ -17,7 +17,7 @@ class Settings(BaseSettings):
 
     # RAG settings
     # Options: "placeholder" | "dev" | "production"
-    RAG_IMPLEMENTATION: str = "placeholder"
+    RAG_IMPLEMENTATION: str
 
     class Config:
         env_file = "./.env"
