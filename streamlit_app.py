@@ -209,7 +209,12 @@ if prompt := st.chat_input("Ask a question about your documents..."):
             )
 
         if resp.status_code == 200:
-            ai_msg = resp.json()
+            result = resp.json()
+            # API returns a list of [user_msg, ai_msg] or a single dict
+            if isinstance(result, list):
+                ai_msg = result[-1]  # last item is the AI response
+            else:
+                ai_msg = result
             ai_content = ai_msg.get("content", "No response")
             st.write(ai_content)
             st.session_state.messages.append({"role": "ai", "content": ai_content})

@@ -9,12 +9,14 @@ from database import models
 logger = logging.getLogger(__name__)
 
 
-def create_document(user_id: int, filename: str, db: Session) -> models.Document:
+def create_document(user_id: int, filename: str, content_type: str, file_size: int, db: Session) -> models.Document:
 
     logger.info(f"Creating document record for user {user_id}: {filename}")
     new_doc = models.Document(
         user_id=user_id,
         filename=filename,
+        content_type=content_type,
+        file_size=file_size,
         processing_status=models.ProcessingStatus.PROCESSING,
     )
     db.add(new_doc)
@@ -37,7 +39,7 @@ def get_documents_for_user(user_id: int, db: Session) -> List[models.Document]:
     return (
         db.query(models.Document)
         .filter(models.Document.user_id == user_id)
-        .order_by(models.Document.upload_date.desc())
+        .order_by(models.Document.upload_time.desc())
         .all()
     )
 

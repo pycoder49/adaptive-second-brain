@@ -92,9 +92,10 @@ def embed_query(query: str) -> List[float]:
 
 
 
-def ingest_document(user_id: int, filename: str, file_bytes: bytes, db: Session) -> models.Document:
+def ingest_document(user_id: int, filename: str, file_bytes: bytes, content_type: str, db: Session) -> models.Document:
 
-    doc = document_access.create_document(user_id, filename, db)
+    file_size = len(file_bytes)
+    doc = document_access.create_document(user_id, filename, content_type, file_size, db)
     logger.info(f"Created document record: id={doc.id}, filename={filename}")
 
     try:

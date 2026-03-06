@@ -11,16 +11,16 @@ from database import models
 logger = logging.getLogger(__name__)
 
 
-def upload_document(user_id: int, filename: str, file_bytes: bytes, db: Session) -> dict:
+def upload_document(user_id: int, filename: str, file_bytes: bytes, content_type: str, db: Session) -> dict:
 
     logger.info(f"Service: uploading document '{filename}' for user {user_id}")
-    doc = ingest_document(user_id, filename, file_bytes, db)
+    doc = ingest_document(user_id, filename, file_bytes, content_type, db)
 
     return {
         "id": doc.id,
         "user_id": doc.user_id,
         "filename": doc.filename,
-        "upload_date": str(doc.upload_date),
+        "upload_date": str(doc.upload_time),
         "processing_status": doc.processing_status.value,
     }
 
@@ -33,7 +33,7 @@ def get_user_documents(user_id: int, db: Session) -> List[dict]:
             "id": doc.id,
             "user_id": doc.user_id,
             "filename": doc.filename,
-            "upload_date": str(doc.upload_date),
+            "upload_date": str(doc.upload_time),
             "processing_status": doc.processing_status.value,
         }
         for doc in docs

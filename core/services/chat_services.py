@@ -115,3 +115,31 @@ def send_message(chat_id: int, user_id: int, user_message: str, document_ids: Li
     ai_msg = add_message_to_chat(chat_id, "ai", ai_response, db)
 
     return ai_msg
+
+
+def post_message_to_chat(chat_id: int, user_id: int, content: str, document_ids: list = None, db: Session = None) -> tuple[dict, dict]:
+    """
+    Posts a user message, runs RAG, saves AI response.
+    Returns (user_message_dict, assistant_message_dict).
+    """
+    logger.info("Posting message to chat via the data access layer")
+
+    # Save user message
+    user_msg = add_message_to_chat(chat_id, "user", content, db)
+
+    # Link documents to chat if provided
+    if document_ids:
+        chat_access.link_documents_to_chat(chat_id, document_ids, db)
+
+    # Get linked documents for RAG context
+    linked_doc_ids = chat_access.get_document_ids_for_chat(chat_id, db)
+
+    if not linked_doc_ids:
+        ai_text = "No documents are linked to this chat. Please upload and attach documents first."
+    else:
+        ai_text = query_rag(content, linked_doc_ids, db)
+
+    # Save AI response
+    ai_msg = add_message_to_chat(chat_id, "ai", ai_text, db)
+
+    return user_msg, ai_msg

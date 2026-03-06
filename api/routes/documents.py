@@ -39,8 +39,10 @@ async def upload_document(
 
     file_bytes = await file.read()
 
+    content_type = file.content_type or "application/octet-stream"
+
     try:
-        result = document_services.upload_document(user["id"], file.filename, file_bytes, db)
+        result = document_services.upload_document(user["id"], file.filename, file_bytes, content_type, db)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
