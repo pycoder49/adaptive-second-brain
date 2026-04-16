@@ -13,10 +13,10 @@ pyjwt
 python-multipart
 aiofiles
 
+boto3
+
 langchain
 langchain-community
 langchain-openai
 chromadb
-
-datetime
 

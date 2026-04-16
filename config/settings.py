@@ -19,6 +19,16 @@ class Settings(BaseSettings):
     # Options: "placeholder" | "dev" | "production"
     RAG_IMPLEMENTATION: str
 
+    # R2 storage settings
+    ACCOUNT_KEY_ID: str
+    SECRET_ACCESS_KEY: str
+    S3_ENDPOINT_URL: str
+    BUCKET_NAME: str
+
+    
+    # NOT ACCESSED
+    ACCOUNT_API_TOKEN: Optional[str] = None
+
     class Config:
         env_file = "./.env"
     

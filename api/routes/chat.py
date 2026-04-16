@@ -19,17 +19,6 @@ router = APIRouter(
 
 
 """
-Need methods for:
-- Getting all chats
-- Getting all messages in a chat
-- Getting a single chat by ID
-
-- Creating a new chat
-- Adding a message to a chat
-"""
-
-
-"""
 Endpoints for chat management
 """
 # get all chats for the current user

@@ -201,6 +201,12 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# Claude
+.claude/
+.claudeignore
+docs/
+CLAUDE.md
+
 # Marimo
 marimo/_static/
 marimo/_lsp/
