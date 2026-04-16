@@ -10,12 +10,7 @@ import enum
 
 from .database import Base
 from core.entities.chat_entity import Role
-
-
-class ProcessingStatus(enum.Enum):
-    READY = "ready"
-    PROCESSING = "processing"
-    FAILED = "failed"
+from core.entities.document_entity import ProcessingStatus
 
 
 class User(Base):
@@ -35,15 +30,16 @@ class User(Base):
 
 
 class Document(Base):
-    # id, user_id(FK), filename, upload_data, processing status
+    # id, user_id(FK), file_name, upload_data, processing status
     __tablename__ = "documents"
 
     id = Column(Integer, primary_key=True, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    filename = Column(String, nullable=False)
-    content_type = Column(String, nullable=False)
+    file_name = Column(String, nullable=False)
     file_size = Column(Integer, nullable=False)
-    upload_time = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    content_type = Column(String, nullable=False)
+    r2_key = Column(String, nullable=False)
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     processing_status = Column(
         Enum(ProcessingStatus), 
         default=ProcessingStatus.PROCESSING, nullable=False
